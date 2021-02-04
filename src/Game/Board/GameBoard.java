@@ -22,9 +22,9 @@ public class GameBoard extends JFrame implements MouseListener {
     int blueCount = 5, greenCount = 8;
     int rowCord , colCord, swap;
     int rowStart, colStart;
-    private BlueBlocks[][] BlueB;
-    private GreenBlocks[][] GreenB;
-    private YellowBlock[][] YellowB;
+    public BlueBlocks[][] BlueB;
+    public GreenBlocks[][] GreenB;
+    public YellowBlock[][] YellowB;
     private YellowBlock selectedBlock;
     public GameBoard() {
 
@@ -36,7 +36,7 @@ public class GameBoard extends JFrame implements MouseListener {
         this.setVisible(true);
         this.addMouseListener(this);
     }
-    private void YellowBSpawn(){
+    public void YellowBSpawn(){
         this.YellowB = new YellowBlock[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
         int YellowCord = ThreadLocalRandom.current().nextInt(1, 5);
         switch (YellowCord) {
@@ -46,7 +46,7 @@ public class GameBoard extends JFrame implements MouseListener {
             default -> this.YellowB[7][7] = (new YellowBlock(7, 7, Color.YELLOW));
         }
     }
-    private void GreenAndBlueSpawn(){
+    public void GreenAndBlueSpawn(){
         this.GreenB = new GreenBlocks[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
         this.BlueB = new BlueBlocks[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
         do{
@@ -70,7 +70,49 @@ public class GameBoard extends JFrame implements MouseListener {
     }
     @Override
     public void mouseClicked(MouseEvent e) {
+        int row = this.getBoardDimentionBasedOnCoordinates(e.getY());
+        int col = this.getBoardDimentionBasedOnCoordinates(e.getX());
+        row--;
+        if ((row < 9 && col < 9) ) {
+            if (this.selectedBlock!=null ) {
+                yellowMove(row,col,rowStart,colStart);
+            } else {
+                rowStart = row;
+                colStart = col;
+                if (this.hasYellowPiece(row, col)) {
+                    this.selectedBlock = this.getYellowPiece(row, col);
+                }
+                Modal.render(this, "Движение", "Можете да се преместите!");
+            }
+        }
 
+    }
+    public  void yellowMove(int row, int col,int rowStart,int colStart){
+        if (this.hasBluePiece(row, col)||this.hasYellowPiece(row,col)) {
+            Modal.render(this, "Внимание", "Не можете да се придвижите в тази посока");
+            this.selectedBlock=null;
+        } else {
+            if((( (row-rowStart>-2 && row-rowStart<2) && col-colStart==0) || ( (col-colStart>-2 && col-colStart<2) && row-rowStart==0))&& this.YellowB[rowStart][colStart].color.equals(Color.YELLOW) ) {
+                YellowBlock p = (YellowBlock) this.selectedBlock;
+                p.move(row, col);
+                if(this.hasGreenPiece(row,col)) {
+                    Modal.render(this, "Внимание", "Открихте Баба Яга");
+
+
+                }
+                this.YellowB[row][col] = this.YellowB[rowStart][colStart];
+                this.YellowB[rowStart][colStart] = null;
+                swap = ThreadLocalRandom.current().nextInt(0, 11);
+                if (swap < 9) {
+                    this.YellowB[rowStart][colStart] = (new YellowBlock(rowStart, colStart, Color.ORANGE));
+                } else this.BlueB[rowStart][colStart] = (new BlueBlocks(rowStart, colStart, Color.BLUE));
+                this.repaint();
+                rowStart = row;
+                colStart = col;
+                this.selectedBlock = null;
+            }else
+                Modal.render(this, "Грешка", "Грешен ход");
+        }
     }
 
     /**
