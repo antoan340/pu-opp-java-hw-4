@@ -30,6 +30,10 @@ public class Modal extends JDialog {
     public static void render(JFrame parent, String title, String message) {
         new Modal(parent, title, message);
     }
+    /**
+     * @param "Рестартиране на игралното поле"
+     * @author Antoan
+     */
     public static void Restart(GameBoard gameBoard) {
         Button.addActionListener(new ButtonClick());
     }
@@ -37,7 +41,7 @@ public class Modal extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            GameBoard
+            GameBoard gameBoard = new GameBoard();
         }
     }
 

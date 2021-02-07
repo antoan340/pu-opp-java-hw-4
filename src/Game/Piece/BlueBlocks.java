@@ -10,7 +10,10 @@ import java.awt.*;
  */
 public class BlueBlocks extends Figure {
     public Color color;
-
+    /**
+     * @param "Задаване на параметри на непроходимите местности"
+     * @author Antoan
+     */
     public BlueBlocks(int row, int col, Color color) {
         super();
         this.row = row;
@@ -21,7 +24,7 @@ public class BlueBlocks extends Figure {
     /**
      *
      * @author Antoan
-     * @param "Визуализиране на пазачите"
+     * @param "Визуализиране на непроходимите местности"
      */
     public void render(Graphics g) {
         int x = this.col * GameTile.TILE_SIZE;

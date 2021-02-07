@@ -11,7 +11,10 @@ import java.awt.*;
 public class GreenBlocks extends Figure {
     public Color color;
 
-
+    /**
+     * @param "Задаване на параметри на къщите на Баба Яга"
+     * @author Antoan
+     */
     public GreenBlocks(int row, int col, Color color) {
         super();
         this.row = row;
@@ -21,7 +24,7 @@ public class GreenBlocks extends Figure {
     /**
      *
      * @author Antoan
-     * @param "Визуализиране на пазачите"
+     * @param "Визуализиране на къщите"
      */
     public void render(Graphics g) {
         int x = this.col * GameTile.TILE_SIZE;

@@ -10,7 +10,10 @@ import java.awt.*;
  */
 public class YellowBlock extends Figure {
     public Color color;
-
+    /**
+     * @param "Задаване на параметри на играч"
+     * @author Antoan
+     */
     public YellowBlock(int row, int col, Color color) {
         super();
         this.row = row;
@@ -20,7 +23,7 @@ public class YellowBlock extends Figure {
     /**
      *
      * @author Antoan
-     * @param "Визуализиране на пазачите"
+     * @param "Визуализиране на играча"
      */
     public void render(Graphics g) {
         int x = this.col * GameTile.TILE_SIZE;
@@ -32,7 +35,7 @@ public class YellowBlock extends Figure {
     /**
      *
      * @author Antoan
-     * @param "движението на гарда"
+     * @param "движението на играча"
      */
     public void move(int row, int col) {
         this.row = row;

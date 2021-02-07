@@ -26,6 +26,10 @@ public class GameBoard extends JFrame implements MouseListener {
     public GreenBlocks[][] GreenB;
     public YellowBlock[][] YellowB;
     private YellowBlock selectedBlock;
+    /**
+     * @param "Инициализацията на игралното поле заедно със всички тайлове"
+     * @author Antoan
+     */
     public GameBoard() {
 
         YellowBSpawn();
@@ -36,6 +40,10 @@ public class GameBoard extends JFrame implements MouseListener {
         this.setVisible(true);
         this.addMouseListener(this);
     }
+    /**
+     * @param "Инициализацията на играча"
+     * @author Antoan
+     */
     public void YellowBSpawn(){
         this.YellowB = new YellowBlock[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
         int YellowCord = ThreadLocalRandom.current().nextInt(1, 5);
@@ -46,6 +54,10 @@ public class GameBoard extends JFrame implements MouseListener {
             default -> this.YellowB[7][7] = (new YellowBlock(7, 7, Color.YELLOW));
         }
     }
+    /**
+     * @param "Инициализирането на случаен принцип на къщите на Баба яга и на непроходимите места"
+     * @author Antoan
+     */
     public void GreenAndBlueSpawn(){
         this.GreenB = new GreenBlocks[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
         this.BlueB = new BlueBlocks[TILE_SIDE_COUNT][TILE_SIDE_COUNT];
@@ -81,44 +93,105 @@ public class GameBoard extends JFrame implements MouseListener {
                 colStart = col;
                 if (this.hasYellowPiece(row, col)) {
                     this.selectedBlock = this.getYellowPiece(row, col);
+                    Modal.render(this, "Движение", "Можете да се преместите!");
                 }
-                Modal.render(this, "Движение", "Можете да се преместите!");
+
             }
         }
 
     }
+    /**
+     * @param "Движението на играча"
+     * @author Antoan
+     */
     public  void yellowMove(int row, int col,int rowStart,int colStart){
-        if (this.hasBluePiece(row, col)||this.hasYellowPiece(row,col)) {
-            Modal.render(this, "Внимание", "Не можете да се придвижите в тази посока");
+        if (this.hasBluePiece(row, col)||(YellowB[row][col]!=null&&YellowB[row][col].color.equals(Color.YELLOW))) {
+            Modal.render(this, "Внимание", "Невалиден ход");
             this.selectedBlock=null;
         } else {
             if((( (row-rowStart>-2 && row-rowStart<2) && col-colStart==0) || ( (col-colStart>-2 && col-colStart<2) && row-rowStart==0))&& this.YellowB[rowStart][colStart].color.equals(Color.YELLOW) ) {
+                if(YellowB[row][col]!=null&&YellowB[row][col].color.equals(Color.ORANGE)){
+                    YellowB[row][col]=null;
+                }
                 YellowBlock p = (YellowBlock) this.selectedBlock;
                 p.move(row, col);
                 if(this.hasGreenPiece(row,col)) {
+                    YellowB[row][col]=null;
                     Modal.render(this, "Внимание", "Открихте Баба Яга");
-
-
                 }
-                this.YellowB[row][col] = this.YellowB[rowStart][colStart];
-                this.YellowB[rowStart][colStart] = null;
-                swap = ThreadLocalRandom.current().nextInt(0, 11);
-                if (swap < 9) {
-                    this.YellowB[rowStart][colStart] = (new YellowBlock(rowStart, colStart, Color.ORANGE));
-                } else this.BlueB[rowStart][colStart] = (new BlueBlocks(rowStart, colStart, Color.BLUE));
+                else {
+                    this.YellowB[row][col] = this.YellowB[rowStart][colStart];
+                    this.YellowB[rowStart][colStart] = null;
+                }
+                trail(rowStart,colStart);
                 this.repaint();
-                rowStart = row;
-                colStart = col;
                 this.selectedBlock = null;
-            }else
+                deadEnd(row,col);
+            }
+            else
                 Modal.render(this, "Грешка", "Грешен ход");
         }
     }
-
     /**
-     * @param "Движението на гарда"
+     * @param "Следата кято се оставя селд играча(проходими и непроходими места)"
      * @author Antoan
      */
+    public void trail(int rowStart,int colStart){
+        swap = ThreadLocalRandom.current().nextInt(1, 11);
+        if (swap < 8) {
+            this.YellowB[rowStart][colStart] = (new YellowBlock(rowStart, colStart, Color.ORANGE));
+        } else this.BlueB[rowStart][colStart] = (new BlueBlocks(rowStart, colStart, Color.BLUE));
+    }
+    /**
+     * @param "Всичко в метода deadEnd е за проверка във всички възможни ситуации дали играча е заобиколен от сини квадратчета"
+     * @author Antoan
+     */
+
+    public void deadEnd(int row,int col) {
+        center(row,col);
+        top(row,col);
+        bottom(row,col);
+    }
+    public void center(int row,int col){
+        if (row > 0 && row < 7 && col > 0 && col < 7)
+            if (BlueB[row + 1][col] != null && BlueB[row - 1][col] != null && BlueB[row][col + 1] != null && BlueB[row][col - 1] != null)
+                System.exit(-1);
+    }
+    public void top(int row,int col){
+        if (row == 0) {
+            if (col > 0 && col < 7) {
+                if (BlueB[row + 1][col] != null && BlueB[row][col + 1] != null && BlueB[row][col - 1] != null)
+                    System.exit(-1);
+            }
+            if (col == 0) {
+                if (BlueB[row + 1][col] != null && BlueB[row][col + 1] != null)
+                    System.exit(-1);
+            }
+            if(col==7){
+                if (BlueB[row + 1][col] != null && BlueB[row][col - 1] != null)
+                    System.exit(-1);
+            }
+        }
+    }
+    public void bottom(int row,int col){
+        if (row == 7) {
+            if (col > 0 && col < 7) {
+                if (BlueB[row - 1][col] != null && BlueB[row][col + 1] != null && BlueB[row][col - 1] != null)
+                    System.exit(-1);
+            }
+            if (col == 0) {
+                if (BlueB[row - 1][col] != null && BlueB[row][col + 1] != null)
+                    System.exit(-1);
+            }
+            if(col==7){
+                if (BlueB[row - 1][col] != null && BlueB[row][col - 1] != null)
+                    System.exit(-1);
+            }
+        }
+    }
+
+
+
 
     @Override
 
@@ -139,34 +212,56 @@ public class GameBoard extends JFrame implements MouseListener {
         }
 
     }
+    /**
+     * @param "Приемане на кординатите на играча"
+     * @author Antoan
+     */
     private YellowBlock getYellowPiece(int row, int col) {
         return this.YellowB[row][col];
 
     }
-
+    /**
+     * @param "Проверка дали на това място има създаден играч"
+     * @author Antoan
+     */
     private boolean hasYellowPiece(int row, int col) {
         return this.getYellowPiece(row, col) != null;
     }
+
+    /**
+     * @param "Приемане на кординатите на къщите в които живее Баба Яга"
+     * @author Antoan
+     */
     private GreenBlocks getGreenPiece(int row, int col) {
         return this.GreenB[row][col];
 
     }
-
+    /**
+     * @param "Проверка дали на това място има създадена къща на Баба Яга"
+     * @author Antoan
+     */
     private boolean hasGreenPiece(int row, int col) {
         return this.getGreenPiece(row, col) != null;
     }
+    /**
+     * @param "Приемане на кординатите на непроходима местност"
+     * @author Antoan
+     */
     private BlueBlocks getBluePiece(int row, int col) {
         return this.BlueB[row][col];
 
     }
-
+    /**
+     * @param "Проверка дали на това място има непроходима местност"
+     * @author Antoan
+     */
     private boolean hasBluePiece(int row, int col) {
         return this.getBluePiece(row, col) != null;
     }
 
 
     /**
-     * @param "проектирането на игралните фигури"
+     * @param "Принтирането на Играча и игралните полета"
      * @author Antoan
      */
     private void renderGamePiece(Graphics g, int row, int col) {
